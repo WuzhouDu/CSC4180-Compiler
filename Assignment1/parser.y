@@ -247,7 +247,7 @@ Node* root_node = nullptr;
 		}
 
 	}
-			// 为什么这里 expression PLUSOP primary 和 primary PLUSOP expression结果不一样🤔
+			// 为什么这里 expression PLUSOP primary 和 primary PLUSOP expression结果不一样🤔, 如果对testcase2.m修改版进行测试的话会很明显。
 			| expression PLUSOP primary {
 				if (cst_only) {
 					$$ = new Node(SymbolClass::EXPRESSION);
