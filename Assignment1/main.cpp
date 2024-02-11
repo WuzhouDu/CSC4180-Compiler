@@ -78,13 +78,17 @@ Allowed options: )");
         std::cerr << "No source program file provided.\n";
         return -1;
     }
+
     freopen(source_filename.c_str(), "r", stdin);
     if (vm.count("scan-only")) {
         scan_only = 1;      // set this flag to enable flex scanner to print out token info
+        
         while (yylex());    // keep extracting tokens from flex scanner
         return 0;
     }
+    // printf("before parse\n");
     yyparse();
+    // printf("after parse\n");
     // Dump token class for CST and lexeme for AST
     export_parse_tree_to_dot(root_node, dot_filename, vm.count("cst-only") ? false : true);
     // cst-only should not pursue IR Generation
