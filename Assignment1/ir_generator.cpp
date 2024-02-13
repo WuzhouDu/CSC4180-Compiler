@@ -38,6 +38,7 @@ void IR_Generator::export_ast_to_llvm_ir(Node *node)
     out << "; Declare printf\ndeclare i32 @printf(i8*, ...)\n\n; Declare scanf\ndeclare i32 @scanf(i8*, ...)\n\n";
     out << "define i32 @main() {\n";
     gen_llvm_ir(node, indexPtr, scanIndexPtr, printIndexPtr, &allocatedTable);
+    out << "\tret i32 0\n";
     out << "}";
 }
 
@@ -262,6 +263,50 @@ void IR_Generator::gen_llvm_ir(Node *node, int *tempIndex, int *scanIndex, int *
 
     // Write Node
     else if (node->symbol_class == SymbolClass::WRITE) {
-        
+        int writeSize = node->children.size();
+        int formatSize = (writeSize - 1) * 3 + 4;
+
+        std::stringstream ss;
+        std::stringstream formatAlloca;
+        std::stringstream formatVar;
+        std::stringstream printString;
+
+        formatAlloca << "[" << formatSize << " x i8]";
+        formatVar << "%_printf_format_" << (*printIndex)++;
+        printString << "%_printf_str_" << *printIndex - 1;
+        ss << "\t" << formatVar.str() << " = " << "alloca " << formatAlloca.str() << "\n";
+
+        ss << "\tstore " << formatAlloca.str() << " c\"";
+        for (int i = 0; i < writeSize-1; i++) {
+            ss << "%d ";
+        }
+        ss << "%d\\0A\\00\", " << formatAlloca.str() << "* " << formatVar.str() << "\n";
+
+        ss << "\t" << printString.str() << " = getelementptr " << formatAlloca.str() << ", " << formatAlloca.str() << "* " << formatVar.str() << ", i32 0, i32 0\n";
+
+        out << ss.str();
+
+        std::vector<std::string> writePtrs(writeSize);
+
+        for (int i = 0; i < writeSize; ++i) {
+            if (node->children[i]->symbol_class == SymbolClass::ID) {
+                writePtrs[i] = "%_tmp_" + std::to_string(*tempIndex);
+                out << "\t%_tmp_" << (*tempIndex)++ << " = load i32, i32* %" << node->children[i]->lexeme << "\n";
+            }
+            else if (node->children[i]->symbol_class == SymbolClass::PLUSOP || node->children[i]->symbol_class == SymbolClass::MINUSOP) {
+                gen_llvm_ir(node->children[i], tempIndex, scanIndex, printIndex, allocatedTable);
+                writePtrs[i] = "%_tmp_" + std::to_string(*tempIndex - 1);
+            }
+            else if (node->children[i]->symbol_class == SymbolClass::INTLITERAL) {
+                writePtrs[i] = node->children[i]->lexeme;
+            }
+        }
+
+        out << "\tcall i32 (i8*, ...) @printf(i8* " << printString.str() << ", ";
+        for (int i = 0; i < writeSize - 1; ++i) {
+            out << "i32 " << writePtrs[i] << ", ";
+        }
+        out << "i32 " << writePtrs.back() << ")\n";
+        return;
     }
 }
