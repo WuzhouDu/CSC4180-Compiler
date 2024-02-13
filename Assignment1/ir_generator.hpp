@@ -15,6 +15,7 @@
 #define CSC4180_IR_GENERATOR_HPP
 
 #include "node.hpp"
+#include <set>
 
 /**
  * TODO: LLVM IR Generator of Micro Language
@@ -43,7 +44,7 @@ private:
      * 
      * @note: this should be a recursive function
      */
-    void gen_llvm_ir(Node* node);
+    void gen_llvm_ir(Node* node, int* tempIndex, int* scanIndex, int* printIndex, std::set<std::string>* allocatedTable);
 
     /* Add any function you want here */
 

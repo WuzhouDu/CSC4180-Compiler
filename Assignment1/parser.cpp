@@ -464,7 +464,7 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    65,    65,    80,    96,   106,   122,   140,   161,   185,
-     189,   208,   221,   239,   250,   265,   281,   294,   304
+     189,   208,   221,   239,   251,   266,   282,   295,   305
 };
 #endif
 
@@ -1484,7 +1484,7 @@ yyreduce:
     break;
 
   case 14:
-#line 250 "parser.y" /* yacc.c:1646  */
+#line 251 "parser.y" /* yacc.c:1646  */
     {
 				if (cst_only) {
 					(yyval.node) = new Node(SymbolClass::EXPRESSION);
@@ -1504,7 +1504,7 @@ yyreduce:
     break;
 
   case 15:
-#line 265 "parser.y" /* yacc.c:1646  */
+#line 266 "parser.y" /* yacc.c:1646  */
     {
 				if (cst_only){
 					(yyval.node) = new Node(SymbolClass::EXPRESSION);
@@ -1523,7 +1523,7 @@ yyreduce:
     break;
 
   case 16:
-#line 281 "parser.y" /* yacc.c:1646  */
+#line 282 "parser.y" /* yacc.c:1646  */
     {
 		if (cst_only) {
 			(yyval.node) = new Node(SymbolClass::PRIMARY);
@@ -1541,7 +1541,7 @@ yyreduce:
     break;
 
   case 17:
-#line 294 "parser.y" /* yacc.c:1646  */
+#line 295 "parser.y" /* yacc.c:1646  */
     {
 				if (cst_only) {
 					(yyval.node) = new Node(SymbolClass::PRIMARY);
@@ -1556,7 +1556,7 @@ yyreduce:
     break;
 
   case 18:
-#line 304 "parser.y" /* yacc.c:1646  */
+#line 305 "parser.y" /* yacc.c:1646  */
     {
 				if (cst_only) {
 					(yyval.node) = new Node(SymbolClass::PRIMARY);
@@ -1799,7 +1799,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 318 "parser.y" /* yacc.c:1906  */
+#line 319 "parser.y" /* yacc.c:1906  */
 
 int yyerror(char *s) {
 	printf("Syntax Error on line %s\n", s);
