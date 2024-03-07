@@ -242,12 +242,12 @@ Node* root_node = nullptr;
 			$$->append_child($1);
 		}
 		else {
-			// 不确定primary是啥，先这么写。
+
 			$$ = $1;
 		}
 
 	}
-			// 为什么这里 expression PLUSOP primary 和 primary PLUSOP expression结果不一样🤔, 如果对testcase2.m修改版进行测试的话会很明显。
+			// 为什么这里 expression PLUSOP primary 和 primary PLUSOP expression结果不一样🤔, 后者问题很大。
 			| expression PLUSOP primary {
 				if (cst_only) {
 					$$ = new Node(SymbolClass::EXPRESSION);
