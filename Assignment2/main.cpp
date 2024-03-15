@@ -24,6 +24,10 @@ int main(int argc, char const *argv[]) {
         std::string filename = argv[1];
         auto scanner = Scanner();
         /* Reserved Keywords Tokens */
+        scanner.add_token("null", NUL);
+        scanner.add_token("true", TRUE);
+        scanner.add_token("false", FALSE);
+
         scanner.add_token("for", FOR);
         scanner.add_token("while", WHILE);
         scanner.add_token("if", IF);
