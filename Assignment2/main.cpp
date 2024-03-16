@@ -27,7 +27,7 @@ int main(int argc, char const *argv[]) {
         scanner.add_token("null", NUL);
         scanner.add_token("true", TRUE);
         scanner.add_token("false", FALSE);
-
+        scanner.add_token("void", TVOID);
         scanner.add_token("for", FOR);
         scanner.add_token("while", WHILE);
         scanner.add_token("if", IF);
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
         scanner.add_token("int", TINT);
         scanner.add_token("bool", TBOOL);
         scanner.add_token("string", TSTRING);
-        /* Punctuations and Brackets */
+        // /* Punctuations and Brackets */
         scanner.add_token("(", LPAREN);
         scanner.add_token(")", RPAREN);
         scanner.add_token("[", LBRACKET);
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
         scanner.add_token("}", RBRACE);
         scanner.add_token(";", SEMICOLON);
         scanner.add_token(",", COMMA);
-        /* Binary Operators */
+        // /* Binary Operators */
         scanner.add_token("*", STAR, 100);
         scanner.add_token("+", PLUS, 90);
         scanner.add_token("-", MINUS, 90);
@@ -65,7 +65,8 @@ int main(int argc, char const *argv[]) {
         scanner.add_token("|", LOR, 40);
         scanner.add_token("[&]", BAND, 30);
         scanner.add_token("[|]", BOR, 20);
-        /* Other Token Classes */
+        scanner.add_token("~", TILDE);
+        // /* Other Token Classes */
         scanner.add_token("=", ASSIGN);
         scanner.add_identifier_token(ID);
         scanner.add_integer_token(INTLITERAL);
