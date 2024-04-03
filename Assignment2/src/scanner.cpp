@@ -363,7 +363,7 @@ Scanner::Scanner() {
 int Scanner::scan(std::string &filename) {
     // Open the file
     std::ifstream file(filename);
-    std::ofstream output("scannerOut.txt");
+    std::ofstream output("scannerOutput.txt");
     if (!file.is_open())
     {
         std::cerr << "Error: Unable to open file: " << filename << std::endl;
@@ -376,7 +376,7 @@ int Scanner::scan(std::string &filename) {
 
     // Read the file character by character
     while (file.get(c)){
-        std::cout << "current char:" << c << std::endl;
+        // std::cout << "current char:" << c << std::endl;
         if (isspace(c) && current_state == dfa->states[0]) continue;
         
         // Check if the current state has a transition for the character
@@ -390,7 +390,7 @@ int Scanner::scan(std::string &filename) {
             // If no transition is available, check if the current state is an accepting state
             if (current_state->accepted) {
                 // Print the token class
-                std::cout << "Token Class: " << token_class_to_str(current_state->token_class) << ": " << token << std::endl;
+                // std::cout << "Token Class: " << token_class_to_str(current_state->token_class) << ": " << token << std::endl;
                 output << token_class_to_str(current_state->token_class) << " " << token << std::endl;
                 token = "";
                 // Reset the DFA state to the initial state
@@ -415,7 +415,7 @@ int Scanner::scan(std::string &filename) {
     if (current_state->accepted)
     {
         // Print the token class
-        std::cout << "Token Class: " << token_class_to_str(current_state->token_class) << ": " << token << std::endl;
+        // std::cout << "Token Class: " << token_class_to_str(current_state->token_class) << ": " << token << std::endl;
         output << token_class_to_str(current_state->token_class) << " " << token << std::endl;
         token = "";
         // Reset the DFA state to the initial state

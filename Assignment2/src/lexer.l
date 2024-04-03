@@ -39,7 +39,7 @@ void printToken(TokenClass tokenType, char* lexeme);
 integer [0-9]+
 id [a-zA-Z][a-zA-Z0-9_]*
 comment \/\*([^*]|\*+[^*/])*\*+\/
-string \"(.)*\"
+string \"[^"]*\"
 
 %%
 {comment} {
@@ -233,7 +233,6 @@ global {
 
 void printToken(TokenClass tokenType, char* lexeme) {
   outputFile << token_class_to_str(tokenType) << " " << lexeme << "\n";
-  if (outputFile.is_open()) std::cout << token_class_to_str(tokenType) << " " << lexeme << "\n";
 }
 
 int main(int argc, char **argv)
