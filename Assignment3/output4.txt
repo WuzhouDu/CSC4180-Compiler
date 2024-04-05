@@ -1,0 +1,222 @@
+Token: int
+Applying rule for non-terminal 'prog' and token 'int':
+  prog -> decl prog 
+Applying rule for non-terminal 'decl' and token 'int':
+  decl -> fdecl 
+Applying rule for non-terminal 'fdecl' and token 'int':
+  fdecl -> t id ( args ) block 
+Applying rule for non-terminal 't' and token 'int':
+  t -> primary_t t_arr 
+Applying rule for non-terminal 'primary_t' and token 'int':
+  primary_t -> int 
+Matched token: int
+
+Token: id
+Applying rule for non-terminal 't_arr' and token 'id':
+  t_arr -> '' 
+Matched token: id
+
+Token: (
+Matched token: (
+
+Token: )
+Applying rule for non-terminal 'args' and token ')':
+  args -> '' 
+Matched token: )
+
+Token: {
+Applying rule for non-terminal 'block' and token '{':
+  block -> { stmts } 
+Matched token: {
+
+Token: var
+Applying rule for non-terminal 'stmts' and token 'var':
+  stmts -> stmt stmts 
+Applying rule for non-terminal 'stmt' and token 'var':
+  stmt -> vdecl ; 
+Applying rule for non-terminal 'vdecl' and token 'var':
+  vdecl -> var id = exp 
+Matched token: var
+
+Token: id
+Matched token: id
+
+Token: =
+Matched token: =
+
+Token: true
+Applying rule for non-terminal 'exp' and token 'true':
+  exp -> term exp' 
+Applying rule for non-terminal 'term' and token 'true':
+  term -> primary 
+Applying rule for non-terminal 'primary' and token 'true':
+  primary -> true 
+Matched token: true
+
+Token: ;
+Applying rule for non-terminal 'exp'' and token ';':
+  exp' -> '' 
+Matched token: ;
+
+Token: var
+Applying rule for non-terminal 'stmts' and token 'var':
+  stmts -> stmt stmts 
+Applying rule for non-terminal 'stmt' and token 'var':
+  stmt -> vdecl ; 
+Applying rule for non-terminal 'vdecl' and token 'var':
+  vdecl -> var id = exp 
+Matched token: var
+
+Token: id
+Matched token: id
+
+Token: =
+Matched token: =
+
+Token: false
+Applying rule for non-terminal 'exp' and token 'false':
+  exp -> term exp' 
+Applying rule for non-terminal 'term' and token 'false':
+  term -> primary 
+Applying rule for non-terminal 'primary' and token 'false':
+  primary -> false 
+Matched token: false
+
+Token: ;
+Applying rule for non-terminal 'exp'' and token ';':
+  exp' -> '' 
+Matched token: ;
+
+Token: if
+Applying rule for non-terminal 'stmts' and token 'if':
+  stmts -> stmt stmts 
+Applying rule for non-terminal 'stmt' and token 'if':
+  stmt -> if_stmt 
+Applying rule for non-terminal 'if_stmt' and token 'if':
+  if_stmt -> if ( exp ) block else_stmt 
+Matched token: if
+
+Token: (
+Matched token: (
+
+Token: id
+Applying rule for non-terminal 'exp' and token 'id':
+  exp -> term exp' 
+Applying rule for non-terminal 'term' and token 'id':
+  term -> primary 
+Applying rule for non-terminal 'primary' and token 'id':
+  primary -> id func_call arr_idx 
+Matched token: id
+
+Token: &
+Applying rule for non-terminal 'func_call' and token '&':
+  func_call -> '' 
+Applying rule for non-terminal 'arr_idx' and token '&':
+  arr_idx -> '' 
+Applying rule for non-terminal 'exp'' and token '&':
+  exp' -> bop term exp' 
+Applying rule for non-terminal 'bop' and token '&':
+  bop -> & 
+Matched token: &
+
+Token: !
+Applying rule for non-terminal 'term' and token '!':
+  term -> uop primary 
+Applying rule for non-terminal 'uop' and token '!':
+  uop -> ! 
+Matched token: !
+
+Token: id
+Applying rule for non-terminal 'primary' and token 'id':
+  primary -> id func_call arr_idx 
+Matched token: id
+
+Token: )
+Applying rule for non-terminal 'func_call' and token ')':
+  func_call -> '' 
+Applying rule for non-terminal 'arr_idx' and token ')':
+  arr_idx -> '' 
+Applying rule for non-terminal 'exp'' and token ')':
+  exp' -> '' 
+Matched token: )
+
+Token: {
+Applying rule for non-terminal 'block' and token '{':
+  block -> { stmts } 
+Matched token: {
+
+Token: return
+Applying rule for non-terminal 'stmts' and token 'return':
+  stmts -> stmt stmts 
+Applying rule for non-terminal 'stmt' and token 'return':
+  stmt -> return exp ; 
+Matched token: return
+
+Token: intliteral
+Applying rule for non-terminal 'exp' and token 'intliteral':
+  exp -> term exp' 
+Applying rule for non-terminal 'term' and token 'intliteral':
+  term -> primary 
+Applying rule for non-terminal 'primary' and token 'intliteral':
+  primary -> intliteral 
+Matched token: intliteral
+
+Token: ;
+Applying rule for non-terminal 'exp'' and token ';':
+  exp' -> '' 
+Matched token: ;
+
+Token: }
+Applying rule for non-terminal 'stmts' and token '}':
+  stmts -> '' 
+Matched token: }
+
+Token: else
+Applying rule for non-terminal 'else_stmt' and token 'else':
+  else_stmt -> else else_body 
+Matched token: else
+
+Token: {
+Applying rule for non-terminal 'else_body' and token '{':
+  else_body -> block 
+Applying rule for non-terminal 'block' and token '{':
+  block -> { stmts } 
+Matched token: {
+
+Token: return
+Applying rule for non-terminal 'stmts' and token 'return':
+  stmts -> stmt stmts 
+Applying rule for non-terminal 'stmt' and token 'return':
+  stmt -> return exp ; 
+Matched token: return
+
+Token: -
+Applying rule for non-terminal 'exp' and token '-':
+  exp -> term exp' 
+Applying rule for non-terminal 'term' and token '-':
+  term -> uop primary 
+Applying rule for non-terminal 'uop' and token '-':
+  uop -> - 
+Matched token: -
+
+Token: intliteral
+Applying rule for non-terminal 'primary' and token 'intliteral':
+  primary -> intliteral 
+Matched token: intliteral
+
+Token: ;
+Applying rule for non-terminal 'exp'' and token ';':
+  exp' -> '' 
+Matched token: ;
+
+Token: }
+Applying rule for non-terminal 'stmts' and token '}':
+  stmts -> '' 
+Matched token: }
+
+Token: }
+Applying rule for non-terminal 'stmts' and token '}':
+  stmts -> '' 
+Matched token: }
+
+Successfully parsing.
