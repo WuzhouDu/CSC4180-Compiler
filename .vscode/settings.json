@@ -59,5 +59,6 @@
         "*.ipp": "cpp",
         "unordered_set": "cpp",
         "queue": "cpp"
-    }
+    },
+    "python.analysis.typeCheckingMode": "off"
 }

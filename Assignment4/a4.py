@@ -415,6 +415,22 @@ def semantic_analysis(node):
         NodeType.STRINGLITERAL: semantic_handler_string,
         NodeType.TRUE: semantic_handler_bool,
         NodeType.FALSE: semantic_handler_bool,
+        NodeType.GLOBAL_DECL: semantic_handler_globalDec,
+        NodeType.FUNC_DECL: semantic_handler_funcDec,
+        NodeType.VAR_DECL: semantic_handler_varDec,
+        NodeType.FUNC_CALL: semantic_handler_funcCall,
+        NodeType.ASSIGN: semantic_handler_assign,
+        NodeType.PLUS: semantic_handler_plus,
+        NodeType.RETURN: semantic_handler_return,
+        NodeType.ARGS: semantic_handler_args,
+        # NodeType.STMTS: semantic_handler_stmts,
+        NodeType.IF_STMT: semantic_handler_ifStmt,
+        NodeType.FOR_LOOP: semantic_handler_forLoop,
+        NodeType.GREAT: semantic_handler_compare,
+        NodeType.GREATEQ: semantic_handler_compare,
+        NodeType.LESS: semantic_handler_compare,
+        NodeType.LESSEQ: semantic_handler_compare,
+        NodeType.WHILE_LOOP: semantic_handler_whileLoop,
         # TODO: add more mapping from NodeType to its corresponding handler functions here
     }
     handler = handler_map.get(node.nodetype)
@@ -460,6 +476,141 @@ def semantic_handler_string(node):
 def default_handler(node):
     for child in node.children:
         semantic_analysis(child)
+
+def semantic_handler_globalDec(node):
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("global declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
+    if (leftNode.lexeme in symbol_table.scopes[0]):
+        raise ValueError("Global variable already exist: ", leftNode.lexeme)
+    else:
+        semantic_analysis(rightNode)
+        symbol_table.scopes[0][leftNode.lexeme] = rightNode.datatype
+        leftNode.datatype = rightNode.datatype
+        leftNode.id = leftNode.lexeme + "-1"
+
+def semantic_handler_funcDec(node):
+    typeNode = node.children[0]
+    nameNode = node.children[1]
+    print("func declaration: id: ", nameNode.lexeme, " type: ", typeNode.lexeme)
+    if (nameNode.lexeme in symbol_table.scopes[0]):
+        raise ValueError("Function already exist: ", nameNode.lexeme)
+    else:
+        semantic_analysis(typeNode)
+        symbol_table.scopes[0][nameNode.lexeme] = typeNode.datatype
+        nameNode.datatype = typeNode.datatype
+        nameNode.id = nameNode.lexeme + "-1"
+        symbol_table.push_scope()
+        for i in range(2, len(node.children)):
+            semantic_analysis(node.children[i])
+        symbol_table.pop_scope()
+
+def semantic_handler_varDec(node):
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("variable declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
+    if (symbol_table.lookup_local(leftNode.lexeme) is not None):
+        raise ValueError("Variable already exist: ", leftNode.lexeme)
+    else:
+        semantic_analysis(rightNode)
+        symbol_table.insert(leftNode.lexeme, rightNode.datatype)
+        leftNode.datatype = rightNode.datatype
+        leftNode.id = leftNode.lexeme + "-" + str(symbol_table.scope_ids[-1])
+
+def semantic_handler_funcCall(node):
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("function call: func: ", leftNode.lexeme, " args: ", rightNode.lexeme)
+    if (leftNode.lexeme not in symbol_table.scopes[0]):
+        raise ValueError("Function not defined: ", leftNode.lexeme)
+    else:
+        leftNode.datatype = symbol_table.scopes[0][leftNode.lexeme]
+        leftNode.id = leftNode.lexeme + "-1"
+        for i in range(len(rightNode.children)):
+            semantic_analysis(rightNode.children[i])
+
+def semantic_handler_assign(node):
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("assignment: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    if (symbol_table.lookup_local(leftNode.lexeme) is None):
+        raise ValueError("Variable not defined: ", leftNode.lexeme)
+    else:
+        semantic_analysis(rightNode)
+        leftNode.datatype = rightNode.datatype
+        leftNode.id = leftNode.lexeme + "-" + str(symbol_table.scope_ids[-1])
+
+def semantic_handler_plus(node):
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("plus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    semantic_analysis(leftNode)
+    semantic_analysis(rightNode)
+    if ((leftNode.datatype != DataType.INT) or (leftNode.datatype != rightNode.datatype)):
+        raise ValueError("Type mismatch in plus: ", leftNode.datatype, " and ", rightNode.datatype)
+    else:
+        node.datatype = leftNode.datatype
+
+def semantic_handler_return(node):
+    assert(len(node.children)) == 1
+    print("return: ", node.children[0].lexeme)
+    semantic_analysis(node.children[0])
+    node.datatype = node.children[0].datatype
+           
+def semantic_handler_args(node):
+    if (len(node.children) == 0):
+        node.datatype = DataType.VOID
+
+def semantic_handler_ifStmt(node):
+    compareNode = node.children[0]
+    if (compareNode.nodetype == NodeType.GREAT or compareNode.nodetype == NodeType.GREATEQ or compareNode.nodetype == NodeType.LESS
+        or compareNode.nodetype == NodeType.LESSEQ):
+        semantic_analysis(node.children[0])
+        assert(node.children[1].nodetype == NodeType.STMTS)
+        symbol_table.push_scope()
+        semantic_analysis(node.children[1])
+        symbol_table.pop_scope()
+        assert(len(node.children) == 3 and node.children[2].nodetype == NodeType.ELSE_STMT)
+        symbol_table.push_scope()
+        semantic_analysis(node.children[2])
+        symbol_table.pop_scope()
+    else:
+        raise ValueError("If STMT has no condition")
+    
+def semantic_handler_forLoop(node):
+    assert(len(node.children) == 4)
+    initNode = node.children[0]
+    compareNode = node.children[1]
+    updateNode = node.children[2]
+    assert(node.children[3].nodetype == NodeType.STMTS)
+    if (initNode.nodetype == NodeType.VAR_DECLS):
+        symbol_table.push_scope()
+        semantic_analysis(initNode)
+        semantic_analysis(compareNode)
+        semantic_analysis(node.children[3])
+        semantic_analysis(updateNode)
+        symbol_table.pop_scope()
+    else:
+        raise ValueError("For loop has no initialization")
+
+def semantic_handler_compare(node):
+    assert(len(node.children) == 2)
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    semantic_analysis(leftNode)
+    semantic_analysis(rightNode)
+    if ((leftNode.datatype != DataType.INT) or (leftNode.datatype != rightNode.datatype)):
+        raise ValueError("Type mismatch in compare: ", leftNode.datatype, " and ", rightNode.datatype)
+    else:
+        node.datatype = DataType.BOOL
+
+def semantic_handler_whileLoop(node):
+    assert(len(node.children) == 2)
+    compareNode = node.children[0]
+    semantic_analysis(compareNode)
+    symbol_table.push_scope()
+    semantic_analysis(node.children[1])
+    symbol_table.pop_scope()
 
 if len(sys.argv) == 3:
     # visualize AST before semantic analysis
