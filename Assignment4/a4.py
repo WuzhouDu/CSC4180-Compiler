@@ -371,6 +371,8 @@ def codegen(node):
     """
     codegen_func_map = {
         NodeType.GLOBAL_DECL: codegen_handler_global_decl,
+        NodeType.FUNC_DECL: codegen_handler_funcDec,
+        NodeType.VAR_DECL: codegen_handler_varDec,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -390,10 +392,55 @@ def codegen_handler_global_decl(node):
     Global variable declaration
     """
     var_name = node.children[0].lexeme
-    variable = ir.GlobalVariable(module, typ=ir_type(node.datatype), name=var_name)
+    variable = ir.GlobalVariable(module, typ=ir_type(node.children[0].datatype), name=var_name)
     variable.linkage = "private"
     variable.global_constant = True
-    variable.initializer = ir.Constant(ir_type(node.datatype))
+    initVal = codegen_handler_literal(node.children[1])
+    variable.initializer = ir.Constant(ir_type(node.children[0].datatype), initVal)
+    ir_map[node.children[0].id] = variable
+
+
+def codegen_handler_literal(node):
+    if (node.nodetype == NodeType.INTLITERAL):
+        return ir.Constant(ir.IntType(32), int(node.lexeme))
+    elif (node.nodetype == NodeType.STRINGLITERAL):
+        return ir.Constant(ir.ArrayType(ir.IntType(8), len(node.lexeme) + 1), bytearray((node.lexeme + '\0').encode('utf-8')))
+    elif (node.nodetype == NodeType.TRUE):
+        return ir.Constant(ir.IntType(32), 1)
+    elif (node.nodetype == NodeType.FALSE):
+        return ir.Constant(ir.IntType(32), 0)
+    else:
+        raise ValueError("Unsupported literal type: ", node.nodetype)
+
+def codegen_handler_funcDec(node):
+    func_name = node.children[1].lexeme
+    func_type = ir.FunctionType(ir_type(node.children[0].datatype), [])
+    func = ir.Function(module, func_type, name=func_name)
+    ir_map[node.children[1].id] = func
+    block = func.append_basic_block("entry")
+    global builder
+    builder = ir.IRBuilder(block)
+    for arg in node.children[2].children:
+        arg_id = symbol_table.insert(arg.children[0].lexeme, arg.datatype)
+        ir_map[arg.children[0].id] = builder.alloca(ir_type(arg.datatype), name=arg_id)
+        builder.store(func.args[arg.index], ir_map[arg.children[0].id])
+    codegen(node.children[3])
+
+
+def codegen_handler_varDec(node):
+    var_name = node.children[0].lexeme
+    var_id = node.children[0].id
+    if (node.children[0].datatype == DataType.STRING):
+        ir_map[var_id] = builder.alloca(ir_type(DataType.STRING, len(node.children[1].lexeme)), name=var_name)
+        builder.store(codegen_handler_literal(node.children[1]), ir_map[var_id])
+    else: 
+        ir_map[var_id] = builder.alloca(ir_type(node.children[0].datatype), name=var_name)
+        initVal = codegen_handler_literal(node.children[1])
+        builder.store(initVal, ir_map[var_id])
+
+
+
+
 
 def semantic_analysis(node):
     """
@@ -652,7 +699,9 @@ elif len(sys.argv) == 4:
     llvm.initialize_native_asmprinter()
     declare_runtime_functions()
     codegen(root_node)
-    # print LLVM IR
-    print(module)
+    # print LLVM IR)
+    with open(llvm_ir, 'w') as f:
+        f.write(str(module))
+    # print(str(module))
 else:
     raise SyntaxError("Usage: python3 a4.py <.dot> <.png before>\nUsage: python3 ./a4.py <.dot> <.png after> <.ll>")
