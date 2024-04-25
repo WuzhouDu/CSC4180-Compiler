@@ -314,49 +314,49 @@ def declare_runtime_functions():
     # map function unique name in global scope to the function body
     # the global scope should have scope_id = 1 
     func = ir.Function(module, func_type, name="array_of_string")
-    ir_map[SymbolTable.unique_name("array_of_string", 1)] = func
+    ir_map[symbol_table.unique_name("array_of_string", 1)] = func
     # char* string_of_array (int32_t *arr)
     func_type = ir.FunctionType(
         ir.PointerType(ir.IntType(8)),      # return type
         [ir.PointerType(ir.IntType(32))])   # args type
     func = ir.Function(module, func_type, name="string_of_array")
-    ir_map[SymbolTable.unique_name("string_of_array", 1)] = func
+    ir_map[symbol_table.unique_name("string_of_array", 1)] = func
     # int32_t length_of_string (char *str)
     func_type = ir.FunctionType(
-        ir.IntType(32)                      # return type
+        ir.IntType(32),                      # return type
         [ir.PointerType(ir.IntType(8))])    # args type
     func = ir.Function(module, func_type, name="length_of_string")
-    ir_map[SymbolTable.unique_name("length_of_string", 1)] = func
+    ir_map[symbol_table.unique_name("length_of_string", 1)] = func
     # char* string_of_int(int32_t i)
     func_type = ir.FunctionType(
         ir.PointerType(ir.IntType(8)),      # return type
         [ir.IntType(32)])                   # args type
     func = ir.Function(module, func_type, name="string_of_int")
-    ir_map[SymbolTable.unique_name("string_of_int", 1)] = func
+    ir_map[symbol_table.unique_name("string_of_int", 1)] = func
     # char* string_cat(char* l, char* r)
     func_type = ir.FunctionType(
         ir.PointerType(ir.IntType(8)),      # return tyoe
         [ir.PointerType(ir.IntType(8)), ir.PointerType(ir.IntType(8))]) # args type
     func = ir.Function(module, func_type, name="string_cat")
-    ir_map[SymbolTable.unique_name("string_cat", 1)] = func
+    ir_map[symbol_table.unique_name("string_cat", 1)] = func
     # void print_string (char* str)
     func_type = ir.FunctionType(
         ir.VoidType(),                      # return type
         [ir.PointerType(ir.IntType(8))])    # args type
     func = ir.Function(module, func_type, name="print_string")
-    ir_map[SymbolTable.unique_name("print_string", 1)] = func
+    ir_map[symbol_table.unique_name("print_string", 1)] = func
     # void print_int (int32_t i)
     func_type = ir.FunctionType(
         ir.VoidType(),                      # return type
         [ir.IntType(32)])                   # args type
     func = ir.Function(module, func_type, name="print_int")
-    ir_map[SymbolTable.unique_name("print_int", 1)] = func
+    ir_map[symbol_table.unique_name("print_int", 1)] = func
     # void print_bool (int32_t i)
     func_type = ir.FunctionType(
         ir.VoidType(),                      # return type
         [ir.IntType(32)])                   # args type
     func = ir.Function(module, func_type, name="print_bool")
-    ir_map[SymbolTable.unique_name("print_bool", 1)] = func
+    ir_map[symbol_table.unique_name("print_bool", 1)] = func
 
 def codegen(node):
     """
@@ -377,7 +377,7 @@ def codegen(node):
     if codegen_func:
         codegen_func(node)
     else:
-        default_handler(node)
+        codegen_handler_default(node)
 
 # Some sample handler functions for IR codegen
 # TODO: implement more handler functions for various node types
@@ -481,7 +481,7 @@ def default_handler(node):
 def semantic_handler_globalDec(node):
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("global declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
+    # print("global declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
     if (leftNode.lexeme in symbol_table.scopes[0]):
         raise ValueError("Global variable already exist: ", leftNode.lexeme)
     else:
@@ -493,7 +493,7 @@ def semantic_handler_globalDec(node):
 def semantic_handler_funcDec(node):
     typeNode = node.children[0]
     nameNode = node.children[1]
-    print("func declaration: id: ", nameNode.lexeme, " type: ", typeNode.lexeme)
+    # print("func declaration: id: ", nameNode.lexeme, " type: ", typeNode.lexeme)
     if (nameNode.lexeme in symbol_table.scopes[0]):
         raise ValueError("Function already exist: ", nameNode.lexeme)
     else:
@@ -509,7 +509,7 @@ def semantic_handler_funcDec(node):
 def semantic_handler_varDec(node):
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("variable declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
+    # print("variable declaration: var: ", leftNode.lexeme, " val: ", rightNode.lexeme)
     if (symbol_table.lookup_local(leftNode.lexeme) is not None):
         raise ValueError("Variable already exist: ", leftNode.lexeme)
     else:
@@ -521,7 +521,7 @@ def semantic_handler_varDec(node):
 def semantic_handler_funcCall(node):
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("function call: func: ", leftNode.lexeme, " args: ", rightNode.lexeme)
+    # print("function call: func: ", leftNode.lexeme, " args: ", rightNode.lexeme)
     if (leftNode.lexeme not in symbol_table.scopes[0]):
         raise ValueError("Function not defined: ", leftNode.lexeme)
     else:
@@ -533,7 +533,7 @@ def semantic_handler_funcCall(node):
 def semantic_handler_assign(node):
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("assignment: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    # print("assignment: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
     if (symbol_table.lookup_global(leftNode.lexeme) is None):
         raise ValueError("Variable not defined: ", leftNode.lexeme)
     else:
@@ -541,15 +541,15 @@ def semantic_handler_assign(node):
         semantic_analysis(leftNode)
 
         if (leftNode.datatype != rightNode.datatype):
-            print("left: ", leftNode.lexeme, leftNode.id, leftNode.datatype)
-            print("right: ", rightNode.lexeme, rightNode.id, rightNode.datatype)
+            # print("left: ", leftNode.lexeme, leftNode.id, leftNode.datatype)
+            # print("right: ", rightNode.lexeme, rightNode.id, rightNode.datatype)
             raise ValueError("Variable assignment invalid")
 
 def semantic_handler_plus(node):
     assert(len(node.children) == 2)
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("plus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    # print("plus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
     semantic_analysis(leftNode)
     semantic_analysis(rightNode)
     if ((leftNode.datatype != DataType.INT) or (leftNode.datatype != rightNode.datatype)):
@@ -559,7 +559,7 @@ def semantic_handler_plus(node):
 
 def semantic_handler_return(node):
     assert(len(node.children)) == 1
-    print("return: ", node.children[0].lexeme)
+    # print("return: ", node.children[0].lexeme)
     semantic_analysis(node.children[0])
     node.datatype = node.children[0].datatype
            
@@ -622,7 +622,7 @@ def semantic_handler_minus(node):
     assert(len(node.children) == 2)
     leftNode = node.children[0]
     rightNode = node.children[1]
-    print("minus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    # print("minus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
     semantic_analysis(leftNode)
     semantic_analysis(rightNode)
     if ((leftNode.datatype != DataType.INT) or (leftNode.datatype != rightNode.datatype)):
@@ -645,14 +645,14 @@ elif len(sys.argv) == 4:
     root_node = construct_tree_from_dot(dot_path)
     semantic_analysis(root_node)
     visualize_tree(root_node, ast_png_after_semantics_analysis)
-    ## Uncomment the following when you are trying the do IR generation
-    # # init llvm
-    # llvm.initialize()
-    # llvm.initialize_native_target()
-    # llvm.initialize_native_asmprinter()
-    # declare_runtime_functions()
-    # codegen(root_node)
-    # # print LLVM IR
-    # print(module)
+    # Uncomment the following when you are trying the do IR generation
+    # init llvm
+    llvm.initialize()
+    llvm.initialize_native_target()
+    llvm.initialize_native_asmprinter()
+    declare_runtime_functions()
+    codegen(root_node)
+    # print LLVM IR
+    print(module)
 else:
     raise SyntaxError("Usage: python3 a4.py <.dot> <.png before>\nUsage: python3 ./a4.py <.dot> <.png after> <.ll>")
