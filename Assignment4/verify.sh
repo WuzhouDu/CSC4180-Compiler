@@ -11,7 +11,7 @@ mkdir -p ./riscv_assembly
 mkdir -p ./executable
 mkdir -p ./output
 
-for test_idx in {3..5}; do
+for test_idx in {0..5}; do
     test="test$test_idx"
     test_program="./test$test_idx.oat"
     tokens="./tokens/${test}.txt"

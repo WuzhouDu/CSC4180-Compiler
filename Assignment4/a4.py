@@ -431,6 +431,7 @@ def semantic_analysis(node):
         NodeType.LESS: semantic_handler_compare,
         NodeType.LESSEQ: semantic_handler_compare,
         NodeType.WHILE_LOOP: semantic_handler_whileLoop,
+        NodeType.MINUS: semantic_handler_minus,
         # TODO: add more mapping from NodeType to its corresponding handler functions here
     }
     handler = handler_map.get(node.nodetype)
@@ -533,14 +534,19 @@ def semantic_handler_assign(node):
     leftNode = node.children[0]
     rightNode = node.children[1]
     print("assignment: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
-    if (symbol_table.lookup_local(leftNode.lexeme) is None):
+    if (symbol_table.lookup_global(leftNode.lexeme) is None):
         raise ValueError("Variable not defined: ", leftNode.lexeme)
     else:
         semantic_analysis(rightNode)
-        leftNode.datatype = rightNode.datatype
-        leftNode.id = leftNode.lexeme + "-" + str(symbol_table.scope_ids[-1])
+        semantic_analysis(leftNode)
+
+        if (leftNode.datatype != rightNode.datatype):
+            print("left: ", leftNode.lexeme, leftNode.id, leftNode.datatype)
+            print("right: ", rightNode.lexeme, rightNode.id, rightNode.datatype)
+            raise ValueError("Variable assignment invalid")
 
 def semantic_handler_plus(node):
+    assert(len(node.children) == 2)
     leftNode = node.children[0]
     rightNode = node.children[1]
     print("plus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
@@ -611,6 +617,18 @@ def semantic_handler_whileLoop(node):
     symbol_table.push_scope()
     semantic_analysis(node.children[1])
     symbol_table.pop_scope()
+
+def semantic_handler_minus(node):
+    assert(len(node.children) == 2)
+    leftNode = node.children[0]
+    rightNode = node.children[1]
+    print("minus: lhs: ", leftNode.lexeme, " rhs: ", rightNode.lexeme)
+    semantic_analysis(leftNode)
+    semantic_analysis(rightNode)
+    if ((leftNode.datatype != DataType.INT) or (leftNode.datatype != rightNode.datatype)):
+        raise ValueError("Type mismatch in minus: ", leftNode.datatype, " and ", rightNode.datatype)
+    else:
+        node.datatype = leftNode.datatype
 
 if len(sys.argv) == 3:
     # visualize AST before semantic analysis
