@@ -395,8 +395,9 @@ def codegen_handler_global_decl(node):
     variable = ir.GlobalVariable(module, typ=ir_type(node.children[0].datatype), name=var_name)
     variable.linkage = "private"
     variable.global_constant = True
-    initVal = codegen_handler_literal(node.children[1])
-    variable.initializer = ir.Constant(ir_type(node.children[0].datatype), initVal)
+    # initVal = codegen_handler_literal(node.children[1])
+    initVal = node.children[1].lexeme
+    variable.initializer = ir.Constant(ir_type(node.children[1].datatype), initVal)
     ir_map[node.children[0].id] = variable
 
 

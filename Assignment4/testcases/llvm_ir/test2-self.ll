@@ -18,7 +18,7 @@ declare void @"print_int"(i32 %".1")
 
 declare void @"print_bool"(i32 %".1") 
 
-@"x" = private constant i32 i32 5
+@"x" = private constant i32 5
 define i32 @"main"() 
 {
 entry:
