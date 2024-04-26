@@ -18,9 +18,15 @@ declare void @"print_int"(i32 %".1")
 
 declare void @"print_bool"(i32 %".1") 
 
-define i32 @"main"() 
+define i32 @"main-1"() 
 {
 entry:
-  %"value" = alloca i32
-  store i32 10, i32* %"value"
+  %"value-2" = alloca i32
+  store i32 10, i32* %"value-2"
+  %".3" = load i32, i32* %"value-2"
+  call void @"print_int"(i32 %".3")
+  %".5" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  call void @"print_string"(i8* %".5")
 }
+
+@"string_literal_\5cn" = private constant [2 x i8] c"\5cn", align 1

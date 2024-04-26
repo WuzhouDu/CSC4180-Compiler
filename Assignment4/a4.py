@@ -373,6 +373,7 @@ def codegen(node):
         NodeType.GLOBAL_DECL: codegen_handler_global_decl,
         NodeType.FUNC_DECL: codegen_handler_funcDec,
         NodeType.VAR_DECL: codegen_handler_varDec,
+        NodeType.FUNC_CALL: codegen_handler_funCall,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -405,6 +406,14 @@ def codegen_handler_literal(node):
     if (node.nodetype == NodeType.INTLITERAL):
         return ir.Constant(ir.IntType(32), int(node.lexeme))
     elif (node.nodetype == NodeType.STRINGLITERAL):
+        # string_content = node.lexeme + '\0'
+        # glbVar = ir.GlobalVariable(module, ir.ArrayType(ir.IntType(8), len(string_content)), name="string_literal_" + node.lexeme)
+        # glbVar.linkage = "private"
+        # glbVar.global_constant = True
+        # glbVar.initializer = ir.Constant(ir.ArrayType(ir.IntType(8), len(string_content)), bytearray(string_content.encode('utf-8')))
+        # zero = ir.Constant(ir.IntType(32), 0)
+        # variable_pointer = builder.gep(glbVar, [zero, zero])
+        # return variable_pointer
         return ir.Constant(ir.ArrayType(ir.IntType(8), len(node.lexeme) + 1), bytearray((node.lexeme + '\0').encode('utf-8')))
     elif (node.nodetype == NodeType.TRUE):
         return ir.Constant(ir.IntType(32), 1)
@@ -414,7 +423,7 @@ def codegen_handler_literal(node):
         raise ValueError("Unsupported literal type: ", node.nodetype)
 
 def codegen_handler_funcDec(node):
-    func_name = node.children[1].lexeme
+    func_name = node.children[1].id
     func_type = ir.FunctionType(ir_type(node.children[0].datatype), [])
     func = ir.Function(module, func_type, name=func_name)
     ir_map[node.children[1].id] = func
@@ -429,19 +438,47 @@ def codegen_handler_funcDec(node):
 
 
 def codegen_handler_varDec(node):
-    var_name = node.children[0].lexeme
     var_id = node.children[0].id
     if (node.children[0].datatype == DataType.STRING):
-        ir_map[var_id] = builder.alloca(ir_type(DataType.STRING, len(node.children[1].lexeme)), name=var_name)
+        ir_map[var_id] = builder.alloca(ir_type(DataType.STRING, len(node.children[1].lexeme)), name=var_id)
         builder.store(codegen_handler_literal(node.children[1]), ir_map[var_id])
     else: 
-        ir_map[var_id] = builder.alloca(ir_type(node.children[0].datatype), name=var_name)
+        ir_map[var_id] = builder.alloca(ir_type(node.children[0].datatype), name=var_id)
         initVal = codegen_handler_literal(node.children[1])
         builder.store(initVal, ir_map[var_id])
 
+def codegen_handler_funCall(node):
+    func_name = node.children[0].id
+    func = ir_map[func_name]
+    args = []
+    for arg in node.children[1].children:
+        args.append(codegen_handler_arg(arg))
+    builder.call(func, args)
+
+def codegen_handler_arg(node):
+    if (node.nodetype == NodeType.ID):
+        if (node.datatype == DataType.STRING):
+            return builder.bitcast(ir_map[node.id], ir.PointerType(ir.IntType(8)))
+        return builder.load(ir_map[node.id])
+    else:
+        if (node.datatype == DataType.STRING):
+            string_literal_ptr = create_global_string(builder, node.lexeme, "string_literal_" + node.lexeme)
+            return string_literal_ptr
+        return codegen_handler_literal(node)
 
 
+def create_global_string(builder: ir.IRBuilder, s: str, name: str) -> ir.Instruction:
+    type_i8_x_len = ir.types.ArrayType(ir.types.IntType(8), len(s))
+    constant = ir.Constant(type_i8_x_len, bytearray(s.encode('utf-8')))
+    variable = ir.GlobalVariable(builder.module, type_i8_x_len, name)
+    variable.linkage = 'private'
+    variable.global_constant = True
+    variable.initializer = constant
+    variable.align = 1
 
+    zero = ir.Constant(ir.IntType(32), 0)
+    variable_pointer = builder.gep(variable, [zero, zero])
+    return variable_pointer
 
 def semantic_analysis(node):
     """

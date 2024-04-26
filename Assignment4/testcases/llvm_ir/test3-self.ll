@@ -18,13 +18,23 @@ declare void @"print_int"(i32 %".1")
 
 declare void @"print_bool"(i32 %".1") 
 
-define i32 @"main"() 
+define i32 @"main-1"() 
 {
 entry:
-  %"y" = alloca i32
-  store i32 5, i32* %"y"
-  %"is_y_positive" = alloca i32
-  store i32 1, i32* %"is_y_positive"
-  %"is_y_positive.1" = alloca i32
-  store i32 0, i32* %"is_y_positive.1"
+  %"y-2" = alloca i32
+  store i32 5, i32* %"y-2"
+  %".3" = load i32, i32* %"y-2"
+  call void @"print_int"(i32 %".3")
+  %".5" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  call void @"print_string"(i8* %".5")
+  %"is_y_positive-3" = alloca i32
+  store i32 1, i32* %"is_y_positive-3"
+  %".8" = load i32, i32* %"is_y_positive-3"
+  call void @"print_bool"(i32 %".8")
+  %"is_y_positive-4" = alloca i32
+  store i32 0, i32* %"is_y_positive-4"
+  %".11" = load i32, i32* %"is_y_positive-4"
+  call void @"print_bool"(i32 %".11")
 }
+
+@"string_literal_\5cn" = private constant [2 x i8] c"\5cn", align 1

@@ -18,9 +18,11 @@ declare void @"print_int"(i32 %".1")
 
 declare void @"print_bool"(i32 %".1") 
 
-define i32 @"main"() 
+define i32 @"main-1"() 
 {
 entry:
-  %"str" = alloca [13 x i8]
-  store [13 x i8] c"hello world!\00", [13 x i8]* %"str"
+  %"str-2" = alloca [13 x i8]
+  store [13 x i8] c"hello world!\00", [13 x i8]* %"str-2"
+  %".3" = bitcast [13 x i8]* %"str-2" to i8*
+  call void @"print_string"(i8* %".3")
 }
