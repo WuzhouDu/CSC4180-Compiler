@@ -27,6 +27,9 @@ entry:
   call void @"print_int"(i32 %".3")
   %".5" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
   call void @"print_string"(i8* %".5")
+  %".7" = load i32, i32* %"value-2"
+  %".8" = sub i32 %".7", 1
+  store i32 %".8", i32* %"value-2"
   ret i32 0
 }
 

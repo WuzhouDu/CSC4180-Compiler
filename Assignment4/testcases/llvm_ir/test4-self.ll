@@ -24,9 +24,12 @@ entry:
   %"i-3" = alloca i32
   store i32 0, i32* %"i-3"
   %".3" = load i32, i32* %"i-3"
-  call void @"print_int"(i32 %".3")
-  %".5" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
-  call void @"print_string"(i8* %".5")
+  %".4" = add i32 %".3", 1
+  store i32 %".4", i32* %"i-3"
+  %".6" = load i32, i32* %"i-3"
+  call void @"print_int"(i32 %".6")
+  %".8" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  call void @"print_string"(i8* %".8")
   ret i32 0
 }
 

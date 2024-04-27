@@ -17,9 +17,10 @@ target triple = "riscv64"
 @string_of_int.len = internal global i32 0, align 4
 @.str.6 = private unnamed_addr constant [4 x i8] c"%ld\00", align 1
 @__PRETTY_FUNCTION__.print_string = private unnamed_addr constant [26 x i8] c"void print_string(char *)\00", align 1
-@.str.7 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
-@.str.8 = private unnamed_addr constant [6 x i8] c"false\00", align 1
-@.str.9 = private unnamed_addr constant [5 x i8] c"true\00", align 1
+@.str.7 = private unnamed_addr constant [4 x i8] c"%s\0A\00", align 1
+@.str.8 = private unnamed_addr constant [5 x i8] c"%ld\0A\00", align 1
+@.str.9 = private unnamed_addr constant [7 x i8] c"false\0A\00", align 1
+@.str.10 = private unnamed_addr constant [6 x i8] c"true\0A\00", align 1
 
 ; Function Attrs: noinline nounwind optnone
 define dso_local i32* @oat_malloc(i32 signext %0) #0 {
@@ -370,7 +371,7 @@ define dso_local void @print_string(i8* %0) #0 {
 
 7:                                                ; preds = %5
   %8 = load i8*, i8** %2, align 8
-  %9 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.7, i64 0, i64 0), i8* %8)
+  %9 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.7, i64 0, i64 0), i8* %8)
   ret void
 }
 
@@ -382,7 +383,7 @@ define dso_local void @print_int(i32 signext %0) #0 {
   store i32 %0, i32* %2, align 4
   %3 = load i32, i32* %2, align 4
   %4 = sext i32 %3 to i64
-  %5 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.6, i64 0, i64 0), i64 %4)
+  %5 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.8, i64 0, i64 0), i64 %4)
   ret void
 }
 
@@ -395,11 +396,11 @@ define dso_local void @print_bool(i32 signext %0) #0 {
   br i1 %4, label %5, label %7
 
 5:                                                ; preds = %1
-  %6 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.8, i64 0, i64 0))
+  %6 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str.9, i64 0, i64 0))
   br label %9
 
 7:                                                ; preds = %1
-  %8 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.9, i64 0, i64 0))
+  %8 = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.10, i64 0, i64 0))
   br label %9
 
 9:                                                ; preds = %7, %5

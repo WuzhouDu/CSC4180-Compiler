@@ -10,9 +10,9 @@ main:                                   # @main
 	.cfi_def_cfa_offset 16
 	sd	ra, 8(sp)
 	.cfi_offset ra, -8
-	addi	a0, zero, 10
+	addi	a0, zero, 15
 	sw	a0, 4(sp)
-	addi	a0, zero, 10
+	addi	a0, zero, 15
 	call	print_int
 	lw	a0, 4(sp)
 	ld	ra, 8(sp)
@@ -439,8 +439,8 @@ print_int:                              # @print_int
 	addi	s0, sp, 32
 	sw	a0, -20(s0)
 	lw	a1, -20(s0)
-	lui	a0, %hi(.L.str.6)
-	addi	a0, a0, %lo(.L.str.6)
+	lui	a0, %hi(.L.str.8)
+	addi	a0, a0, %lo(.L.str.8)
 	call	printf
 	ld	s0, 16(sp)
 	ld	ra, 24(sp)
@@ -463,13 +463,13 @@ print_bool:                             # @print_bool
 	bnez	a0, .LBB10_2
 	j	.LBB10_1
 .LBB10_1:
-	lui	a0, %hi(.L.str.8)
-	addi	a0, a0, %lo(.L.str.8)
+	lui	a0, %hi(.L.str.9)
+	addi	a0, a0, %lo(.L.str.9)
 	call	printf
 	j	.LBB10_3
 .LBB10_2:
-	lui	a0, %hi(.L.str.9)
-	addi	a0, a0, %lo(.L.str.9)
+	lui	a0, %hi(.L.str.10)
+	addi	a0, a0, %lo(.L.str.10)
 	call	printf
 	j	.LBB10_3
 .LBB10_3:
@@ -554,18 +554,23 @@ string_of_int.len:
 
 	.type	.L.str.7,@object        # @.str.7
 .L.str.7:
-	.asciz	"%s"
-	.size	.L.str.7, 3
+	.asciz	"%s\n"
+	.size	.L.str.7, 4
 
 	.type	.L.str.8,@object        # @.str.8
 .L.str.8:
-	.asciz	"false"
-	.size	.L.str.8, 6
+	.asciz	"%ld\n"
+	.size	.L.str.8, 5
 
 	.type	.L.str.9,@object        # @.str.9
 .L.str.9:
-	.asciz	"true"
-	.size	.L.str.9, 5
+	.asciz	"false\n"
+	.size	.L.str.9, 7
+
+	.type	.L.str.10,@object       # @.str.10
+.L.str.10:
+	.asciz	"true\n"
+	.size	.L.str.10, 6
 
 	.ident	"clang version 10.0.0-4ubuntu1~18.04.2 "
 	.section	".note.GNU-stack","",@progbits

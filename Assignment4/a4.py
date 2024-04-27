@@ -375,6 +375,7 @@ def codegen(node):
         NodeType.VAR_DECL: codegen_handler_varDec,
         NodeType.FUNC_CALL: codegen_handler_funCall,
         NodeType.RETURN: codegen_handler_ret,
+        NodeType.ASSIGN: codegen_handler_assign,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -482,6 +483,17 @@ def create_global_string(builder: ir.IRBuilder, s: str, name: str) -> ir.Instruc
     zero = ir.Constant(ir.IntType(32), 0)
     variable_pointer = builder.gep(variable, [zero, zero])
     return variable_pointer
+
+def codegen_handler_assign(node):
+    rhs = codegen_handler_operator(node.children[1])
+    var_name = node.children[0].id
+    builder.store(rhs, ir_map[var_name])
+
+def codegen_handler_operator(node):
+    if (node.nodetype == NodeType.PLUS):
+        return builder.add(codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
+    elif (node.nodetype == NodeType.MINUS):
+        return builder.sub(codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
 
 def semantic_analysis(node):
     """

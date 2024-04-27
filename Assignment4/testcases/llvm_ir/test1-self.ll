@@ -24,7 +24,10 @@ entry:
   %"x-2" = alloca i32
   store i32 10, i32* %"x-2"
   %".3" = load i32, i32* %"x-2"
-  call void @"print_int"(i32 %".3")
-  %".5" = load i32, i32* %"x-2"
-  ret i32 %".5"
+  %".4" = add i32 %".3", 5
+  store i32 %".4", i32* %"x-2"
+  %".6" = load i32, i32* %"x-2"
+  call void @"print_int"(i32 %".6")
+  %".8" = load i32, i32* %"x-2"
+  ret i32 %".8"
 }

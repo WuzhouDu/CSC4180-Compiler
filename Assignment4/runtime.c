@@ -93,18 +93,18 @@ char* string_cat(char* l, char* r) {
 
 void print_string (char* str) {
   assert (NULL != str);
-  printf ("%s", str);
+  printf ("%s\n", str);
 }
 
 void print_int (int32_t i) {
-  printf ("%ld", (long)i);
+  printf ("%ld\n", (long)i);
 }
 
 void print_bool (int32_t i) {
   if (i == 0) {
-    printf ("false");
+    printf ("false\n");
   } else {
-    printf ("true");
+    printf ("true\n");
   }
 }
 
