@@ -486,8 +486,8 @@ print_bool:                             # @print_bool
 	.type	".Lstring_literal_\n",@object # @"string_literal_\\n"
 	.section	.rodata,"a",@progbits
 ".Lstring_literal_\n":
-	.ascii	"\\n"
-	.size	".Lstring_literal_\n", 2
+	.asciz	"\\n"
+	.size	".Lstring_literal_\n", 3
 
 	.type	.L.str,@object          # @.str
 	.section	.rodata.str1.1,"aMS",@progbits,1

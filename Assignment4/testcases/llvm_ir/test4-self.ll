@@ -28,9 +28,9 @@ entry:
   store i32 %".4", i32* %"i-3"
   %".6" = load i32, i32* %"i-3"
   call void @"print_int"(i32 %".6")
-  %".8" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  %".8" = getelementptr [3 x i8], [3 x i8]* @"string_literal_\5cn", i32 0, i32 0
   call void @"print_string"(i8* %".8")
   ret i32 0
 }
 
-@"string_literal_\5cn" = private constant [2 x i8] c"\5cn", align 1
+@"string_literal_\5cn" = private constant [3 x i8] c"\5cn\00"

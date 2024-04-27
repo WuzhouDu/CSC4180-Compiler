@@ -25,17 +25,25 @@ entry:
   store i32 5, i32* %"y-2"
   %".3" = load i32, i32* %"y-2"
   call void @"print_int"(i32 %".3")
-  %".5" = getelementptr [2 x i8], [2 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  %".5" = getelementptr [3 x i8], [3 x i8]* @"string_literal_\5cn", i32 0, i32 0
   call void @"print_string"(i8* %".5")
+  %".7" = load i32, i32* %"y-2"
+  %".8" = icmp sgt i32 %".7", 0
+  br i1 %".8", label %"if_block", label %"else_block"
+if_block:
   %"is_y_positive-3" = alloca i32
   store i32 1, i32* %"is_y_positive-3"
-  %".8" = load i32, i32* %"is_y_positive-3"
-  call void @"print_bool"(i32 %".8")
+  %".11" = load i32, i32* %"is_y_positive-3"
+  call void @"print_bool"(i32 %".11")
+  br label %"merge_block"
+else_block:
   %"is_y_positive-4" = alloca i32
   store i32 0, i32* %"is_y_positive-4"
-  %".11" = load i32, i32* %"is_y_positive-4"
-  call void @"print_bool"(i32 %".11")
+  %".15" = load i32, i32* %"is_y_positive-4"
+  call void @"print_bool"(i32 %".15")
+  br label %"merge_block"
+merge_block:
   ret i32 0
 }
 
-@"string_literal_\5cn" = private constant [2 x i8] c"\5cn", align 1
+@"string_literal_\5cn" = private constant [3 x i8] c"\5cn\00"

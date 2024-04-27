@@ -9,22 +9,37 @@ main:                                   # @main
 	addi	sp, sp, -32
 	.cfi_def_cfa_offset 32
 	sd	ra, 24(sp)
+	sd	s0, 16(sp)
 	.cfi_offset ra, -8
+	.cfi_offset s0, -16
+	addi	s0, sp, 32
+	.cfi_def_cfa s0, 0
 	addi	a0, zero, 5
-	sw	a0, 20(sp)
+	sw	a0, -20(s0)
 	addi	a0, zero, 5
 	call	print_int
 	lui	a0, %hi(".Lstring_literal_\n")
 	addi	a0, a0, %lo(".Lstring_literal_\n")
 	call	print_string
+	lw	a1, -20(s0)
 	addi	a0, zero, 1
-	sw	a0, 16(sp)
+	blt	a1, a0, .LBB0_2
+# %bb.1:                                # %if_block
+	mv	a1, sp
+	addi	sp, a1, -16
+	sw	a0, -16(a1)
 	addi	a0, zero, 1
-	call	print_bool
-	sw	zero, 12(sp)
+	j	.LBB0_3
+.LBB0_2:                                # %else_block
+	mv	a0, sp
+	addi	sp, a0, -16
+	sw	zero, -16(a0)
 	mv	a0, zero
+.LBB0_3:                                # %merge_block
 	call	print_bool
 	mv	a0, zero
+	addi	sp, s0, -32
+	ld	s0, 16(sp)
 	ld	ra, 24(sp)
 	addi	sp, sp, 32
 	ret
@@ -493,8 +508,8 @@ print_bool:                             # @print_bool
 	.type	".Lstring_literal_\n",@object # @"string_literal_\\n"
 	.section	.rodata,"a",@progbits
 ".Lstring_literal_\n":
-	.ascii	"\\n"
-	.size	".Lstring_literal_\n", 2
+	.asciz	"\\n"
+	.size	".Lstring_literal_\n", 3
 
 	.type	.L.str,@object          # @.str
 	.section	.rodata.str1.1,"aMS",@progbits,1

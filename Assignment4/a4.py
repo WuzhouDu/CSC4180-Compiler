@@ -376,6 +376,7 @@ def codegen(node):
         NodeType.FUNC_CALL: codegen_handler_funCall,
         NodeType.RETURN: codegen_handler_ret,
         NodeType.ASSIGN: codegen_handler_assign,
+        NodeType.IF_STMT: codegen_handler_if_stmt,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -464,7 +465,7 @@ def codegen_handler_arg(node):
         return builder.load(ir_map[node.id])
     else:
         if (node.datatype == DataType.STRING):
-            string_literal_ptr = create_global_string(builder, node.lexeme, "string_literal_" + node.lexeme)
+            string_literal_ptr = create_global_string(builder, node.lexeme + '\0', "string_literal_" + node.lexeme)
             return string_literal_ptr
         return codegen_handler_literal(node)
 
@@ -478,7 +479,6 @@ def create_global_string(builder: ir.IRBuilder, s: str, name: str) -> ir.Instruc
     variable.linkage = 'private'
     variable.global_constant = True
     variable.initializer = constant
-    variable.align = 1
 
     zero = ir.Constant(ir.IntType(32), 0)
     variable_pointer = builder.gep(variable, [zero, zero])
@@ -494,6 +494,42 @@ def codegen_handler_operator(node):
         return builder.add(codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
     elif (node.nodetype == NodeType.MINUS):
         return builder.sub(codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
+
+def codegen_handler_if_stmt(node):
+    contion_node = node.children[0]
+    condition = codegen_handler_condition(contion_node)
+    if_block = builder.append_basic_block("if_block")
+    if (len(node.children) == 2):
+        merge_block = builder.append_basic_block("merge_block")
+        builder.cbranch(condition, if_block, merge_block)
+        builder.position_at_end(if_block)
+        codegen(node.children[1])
+        builder.branch(merge_block)
+        builder.position_at_end(merge_block)
+    else:
+        else_block = builder.append_basic_block("else_block")
+        merge_block = builder.append_basic_block("merge_block")
+        builder.cbranch(condition, if_block, else_block)
+        builder.position_at_end(if_block)
+        codegen(node.children[1])
+        builder.branch(merge_block)
+        builder.position_at_end(else_block)
+        codegen(node.children[2])
+        builder.branch(merge_block)
+        builder.position_at_end(merge_block)
+
+
+
+
+def codegen_handler_condition(node):
+    if (node.nodetype == NodeType.GREAT):
+        return builder.icmp_signed(">", codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
+    elif (node.nodetype == NodeType.GREATEQ):
+        return builder.icmp_signed(">=", codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
+    elif (node.nodetype == NodeType.LESS):
+        return builder.icmp_signed("<", codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
+    elif (node.nodetype == NodeType.LESSEQ):
+        return builder.icmp_signed("<=", codegen_handler_arg(node.children[0]), codegen_handler_arg(node.children[1]))
 
 def semantic_analysis(node):
     """
