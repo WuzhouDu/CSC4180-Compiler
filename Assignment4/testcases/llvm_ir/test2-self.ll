@@ -19,7 +19,7 @@ declare void @"print_int"(i32 %".1")
 declare void @"print_bool"(i32 %".1") 
 
 @"x" = private constant i32 5
-define i32 @"main-1"() 
+define i32 @"main"() 
 {
 entry:
   %".2" = load i32, i32* @"x"
@@ -28,4 +28,6 @@ entry:
   store i32 10, i32* %"x-2"
   %".5" = load i32, i32* %"x-2"
   call void @"print_int"(i32 %".5")
+  %".7" = load i32, i32* %"x-2"
+  ret i32 %".7"
 }

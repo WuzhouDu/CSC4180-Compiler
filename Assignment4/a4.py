@@ -374,6 +374,7 @@ def codegen(node):
         NodeType.FUNC_DECL: codegen_handler_funcDec,
         NodeType.VAR_DECL: codegen_handler_varDec,
         NodeType.FUNC_CALL: codegen_handler_funCall,
+        NodeType.RETURN: codegen_handler_ret,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -423,7 +424,7 @@ def codegen_handler_literal(node):
         raise ValueError("Unsupported literal type: ", node.nodetype)
 
 def codegen_handler_funcDec(node):
-    func_name = node.children[1].id
+    func_name = node.children[1].lexeme
     func_type = ir.FunctionType(ir_type(node.children[0].datatype), [])
     func = ir.Function(module, func_type, name=func_name)
     ir_map[node.children[1].id] = func
@@ -466,6 +467,8 @@ def codegen_handler_arg(node):
             return string_literal_ptr
         return codegen_handler_literal(node)
 
+def codegen_handler_ret(node):
+    builder.ret(codegen_handler_arg(node.children[0]))
 
 def create_global_string(builder: ir.IRBuilder, s: str, name: str) -> ir.Instruction:
     type_i8_x_len = ir.types.ArrayType(ir.types.IntType(8), len(s))

@@ -18,7 +18,7 @@ declare void @"print_int"(i32 %".1")
 
 declare void @"print_bool"(i32 %".1") 
 
-define i32 @"main-1"() 
+define i32 @"main"() 
 {
 entry:
   %"y-2" = alloca i32
@@ -35,6 +35,7 @@ entry:
   store i32 0, i32* %"is_y_positive-4"
   %".11" = load i32, i32* %"is_y_positive-4"
   call void @"print_bool"(i32 %".11")
+  ret i32 0
 }
 
 @"string_literal_\5cn" = private constant [2 x i8] c"\5cn", align 1
