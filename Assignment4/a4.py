@@ -378,6 +378,7 @@ def codegen(node):
         NodeType.ASSIGN: codegen_handler_assign,
         NodeType.IF_STMT: codegen_handler_if_stmt,
         NodeType.FOR_LOOP: codegen_handler_for_stmt,
+        NodeType.WHILE_LOOP: codegen_handler_while_stmt,
         # TODO: add more mappings from NodeType to its handler function of IR generation
     }
     codegen_func = codegen_func_map.get(node.nodetype)
@@ -548,11 +549,25 @@ def codegen_handler_for_stmt(node):
     update_node = node.children[2]
     codegen(update_node)
     builder.branch(loop_header)
-    
+
     builder.position_at_end(loop_end)
 
+def codegen_handler_while_stmt(node):
+    loop_header = builder.append_basic_block("loop.header")
+    loop_body = builder.append_basic_block("loop.body")
+    loop_end = builder.append_basic_block("loop.end")
 
+    builder.branch(loop_header)
+    builder.position_at_end(loop_header)
+    condition_node = node.children[0]
+    condition = codegen_handler_condition(condition_node)
+    builder.cbranch(condition, loop_body, loop_end)
 
+    builder.position_at_end(loop_body)
+    codegen(node.children[1])
+    builder.branch(loop_header)
+
+    builder.position_at_end(loop_end)
 
 def semantic_analysis(node):
     """
