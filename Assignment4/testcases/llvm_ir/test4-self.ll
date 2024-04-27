@@ -23,13 +23,21 @@ define i32 @"main"()
 entry:
   %"i-3" = alloca i32
   store i32 0, i32* %"i-3"
-  %".3" = load i32, i32* %"i-3"
-  %".4" = add i32 %".3", 1
-  store i32 %".4", i32* %"i-3"
-  %".6" = load i32, i32* %"i-3"
-  call void @"print_int"(i32 %".6")
-  %".8" = getelementptr [3 x i8], [3 x i8]* @"string_literal_\5cn", i32 0, i32 0
-  call void @"print_string"(i8* %".8")
+  br label %"loop.header"
+loop.header:
+  %".4" = load i32, i32* %"i-3"
+  %".5" = icmp slt i32 %".4", 10
+  br i1 %".5", label %"loop.body", label %"loop.end"
+loop.body:
+  %".7" = load i32, i32* %"i-3"
+  call void @"print_int"(i32 %".7")
+  %".9" = getelementptr [3 x i8], [3 x i8]* @"string_literal_\5cn", i32 0, i32 0
+  call void @"print_string"(i8* %".9")
+  %".11" = load i32, i32* %"i-3"
+  %".12" = add i32 %".11", 1
+  store i32 %".12", i32* %"i-3"
+  br label %"loop.header"
+loop.end:
   ret i32 0
 }
 

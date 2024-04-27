@@ -6,20 +6,37 @@
 main:                                   # @main
 	.cfi_startproc
 # %bb.0:                                # %entry
-	addi	sp, sp, -16
-	.cfi_def_cfa_offset 16
-	sd	ra, 8(sp)
+	addi	sp, sp, -32
+	.cfi_def_cfa_offset 32
+	sd	ra, 24(sp)
+	sd	s0, 16(sp)
+	sd	s1, 8(sp)
 	.cfi_offset ra, -8
-	addi	a0, zero, 1
-	sw	a0, 4(sp)
-	addi	a0, zero, 1
-	call	print_int
+	.cfi_offset s0, -16
+	.cfi_offset s1, -24
+	sw	zero, 4(sp)
+	addi	s1, zero, 9
 	lui	a0, %hi(".Lstring_literal_\n")
-	addi	a0, a0, %lo(".Lstring_literal_\n")
+	addi	s0, a0, %lo(".Lstring_literal_\n")
+	lw	a0, 4(sp)
+	blt	s1, a0, .LBB0_2
+.LBB0_1:                                # %loop.body
+                                        # =>This Inner Loop Header: Depth=1
+	lw	a0, 4(sp)
+	call	print_int
+	mv	a0, s0
 	call	print_string
+	lw	a0, 4(sp)
+	addi	a0, a0, 1
+	sw	a0, 4(sp)
+	lw	a0, 4(sp)
+	bge	s1, a0, .LBB0_1
+.LBB0_2:                                # %loop.end
 	mv	a0, zero
-	ld	ra, 8(sp)
-	addi	sp, sp, 16
+	ld	s1, 8(sp)
+	ld	s0, 16(sp)
+	ld	ra, 24(sp)
+	addi	sp, sp, 32
 	ret
 .Lfunc_end0:
 	.size	main, .Lfunc_end0-main
